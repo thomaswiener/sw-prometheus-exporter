@@ -22,7 +22,7 @@
     }
   },
   "extra": {
-    "shopware-plugin-class": "Wienerio\\ShopwarePrometheusExporter",
+    "shopware-plugin-class": "Wienerio\\ShopwarePrometheusExporter\\ShopwarePrometheusExporter",
     "label": {
       "de-DE": "Shopware Prometheus Exporter",
       "en-GB": "Shopware Prometheus Exporter"
