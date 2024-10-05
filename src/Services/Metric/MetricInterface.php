@@ -32,4 +32,8 @@ interface MetricInterface
     public function isEnabled(): bool;
 
     public function getData(): array;
+
+    public function getName(): string;
+
+    public function getType(): string;
 }

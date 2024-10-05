@@ -2,10 +2,12 @@
 
 namespace Wienerio\ShopwarePrometheusExporter\Command;
 
+use Iterator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Wienerio\ShopwarePrometheusExporter\Services\Metric\MetricInterface;
 
 #[AsCommand(
     name: 'wio:prometheus:metrics:test',
@@ -14,7 +16,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class TestCommand extends Command
 {
     public function __construct(
+        private readonly iterable $metrics
     ) {
+        $a = 1;
         parent::__construct();
     }
 
@@ -31,6 +35,11 @@ class TestCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        foreach ($this->metrics as $metric) {
+            /** @var MetricInterface $metric */
+            $data = $metric->getData();
+            $output->writeln(implode("\n", $data));
+        }
         return Command::SUCCESS;
     }
 }

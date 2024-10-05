@@ -18,17 +18,28 @@ services:
       - !tagged 'sw.prometheus.metric'
       - '@logger'
 
-  Wienerio\ShopwarePrometheusExporter\Services\Metric\Order:
+  Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersCountTotal:
     arguments:
+      - '@Doctrine\DBAL\Connection'
       - '@logger'
     tags: ['sw.prometheus.metric']
 
-  Wienerio\ShopwarePrometheusExporter\Services\Metric\Customer:
+  Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersAmountTotal:
     arguments:
+      - '@Doctrine\DBAL\Connection'
       - '@logger'
     tags: ['sw.prometheus.metric']
 
-  Wienerio\ShopwarePrometheusExporter\Services\Metric\Product:
+  Wienerio\ShopwarePrometheusExporter\Services\Metric\CustomersCountTotal:
     arguments:
+      - '@Doctrine\DBAL\Connection'
       - '@logger'
     tags: ['sw.prometheus.metric']
+
+  #################################
+  # Command
+  #################################
+  Wienerio\ShopwarePrometheusExporter\Command\TestCommand:
+    arguments:
+      - !tagged 'sw.prometheus.metric'
+    tags: [ { name: console.command, command: "wio:prometheus:metrics:test" } ]
