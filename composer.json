@@ -1,0 +1,41 @@
+{
+  "name": "wienerio/sw-prometheus-exporter",
+  "description": "SW6 Plugin",
+  "type": "shopware-platform-plugin",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Thomas Wiener",
+      "homepage": "https://www.wiener.io",
+      "email": "wiener.thomas@googlemail.com"
+    }
+  ],
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "require": {
+    "shopware/core": "*",
+    "shopware/storefront": "*",
+    "symfony/form": "^7.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Wienerio\\ShopwarePrometheusExporter\\": "src/"
+    }
+  },
+  "repositories": {},
+  "extra": {
+    "shopware-plugin-class": "Wienerio\\ShopwarePrometheusExporter",
+    "label": {
+      "de-DE": "Shopware Prometheus Exporter",
+      "en-GB": "Shopware Prometheus Exporter"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "symfony/runtime": true
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.3"
+  }
+}
