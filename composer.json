@@ -10,7 +10,7 @@
       "email": "wiener.thomas@googlemail.com"
     }
   ],
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
     "shopware/core": "*",
@@ -22,7 +22,6 @@
       "Wienerio\\ShopwarePrometheusExporter\\": "src/"
     }
   },
-  "repositories": {},
   "extra": {
     "shopware-plugin-class": "Wienerio\\ShopwarePrometheusExporter",
     "label": {
