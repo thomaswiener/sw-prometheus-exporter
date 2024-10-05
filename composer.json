@@ -14,8 +14,7 @@
   "prefer-stable": true,
   "require": {
     "shopware/core": "*",
-    "shopware/storefront": "*",
-    "symfony/form": "^7.1"
+    "shopware/storefront": "*"
   },
   "autoload": {
     "psr-4": {
