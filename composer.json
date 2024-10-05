@@ -1,5 +1,5 @@
 {
-  "name": "wienerio/sw-prometheus-exporter",
+  "name": "thomaswiener/sw-prometheus-exporter",
   "description": "SW6 Plugin",
   "type": "shopware-platform-plugin",
   "license": "proprietary",
