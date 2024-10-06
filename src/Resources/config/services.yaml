@@ -7,9 +7,12 @@ services:
     public: true
 
   Wienerio\ShopwarePrometheusExporter\Controller\Storefront\MetricsController:
+    public: true
     arguments:
       - '@Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector'
       - '@logger'
+    calls:
+      - setContainer: ['@service_container']
 
   Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector:
     arguments:

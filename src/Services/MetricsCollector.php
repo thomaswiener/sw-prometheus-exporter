@@ -3,16 +3,14 @@
 namespace Wienerio\ShopwarePrometheusExporter\Services;
 
 use Exception;
-use Iterator;
 use Psr\Log\LoggerInterface;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Wienerio\ShopwarePrometheusExporter\Services\Metric\MetricInterface;
 use Wienerio\ShopwarePrometheusExporter\ShopwarePrometheusExporter;
 
 class MetricsCollector
 {
     public function __construct(
-        private readonly iterator $metrics,
+        private readonly iterable $metrics,
         private readonly LoggerInterface $logger
     ) {}
 
