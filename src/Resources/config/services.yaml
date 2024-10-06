@@ -8,13 +8,11 @@ services:
 
   Wienerio\ShopwarePrometheusExporter\Controller\Storefront\MetricsController:
     arguments:
-      - '@Shopware\Core\System\SystemConfig\SystemConfigService'
-      - !tagged 'sw.prometheus.metric'
+      - '@Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector'
       - '@logger'
 
   Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector:
     arguments:
-      - '@Shopware\Core\System\SystemConfig\SystemConfigService'
       - !tagged 'sw.prometheus.metric'
       - '@logger'
 

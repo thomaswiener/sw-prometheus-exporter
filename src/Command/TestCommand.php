@@ -5,6 +5,7 @@ namespace Wienerio\ShopwarePrometheusExporter\Command;
 use Iterator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Wienerio\ShopwarePrometheusExporter\Services\Metric\MetricInterface;
@@ -23,7 +24,11 @@ class TestCommand extends Command
 
     protected function configure(): void
     {
-        $this->setName('WienerioPrometheusMetrics');
+        $this
+            ->setName('SwPrometheusMetrics')
+            ->setDescription('Helper Command to test metrics rendering')
+            ->addArgument('metric-name', InputArgument::REQUIRED, 'Metric Name');
+
     }
 
     /**
@@ -35,9 +40,16 @@ class TestCommand extends Command
     {
         foreach ($this->metrics as $metric) {
             /** @var MetricInterface $metric */
+            if ($metric->getName() !== $input->getArgument('metric-name')) {
+                continue;
+            }
+
             $data = $metric->getData();
             $output->writeln(implode("\n", $data));
+
+            break;
         }
+
         return Command::SUCCESS;
     }
 }

@@ -12,7 +12,6 @@ use Wienerio\ShopwarePrometheusExporter\ShopwarePrometheusExporter;
 class MetricsCollector
 {
     public function __construct(
-        private readonly SystemConfigService $systemConfigService,
         private readonly iterator $metrics,
         private readonly LoggerInterface $logger
     ) {}
@@ -31,8 +30,9 @@ class MetricsCollector
                 $context = [
                     'plugin' => ShopwarePrometheusExporter::UNIQUE_IDENTIFIER,
                     'metric' => $metric->getName(),
+                    'message' => $e->getMessage()
                 ];
-                $this->logger->error('');
+                $this->logger->error('Error getting metric data for prometheus', $context);
             }
         }
 
