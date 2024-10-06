@@ -1,50 +1,35 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Wienerio\ShopwarePrometheusExporter\Tests\Controller\Storefront;
 
-use ArrayIterator;
-use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\HttpFoundation\Request;
 use Wienerio\ShopwarePrometheusExporter\Controller\Storefront\MetricsController;
-use Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersCountTotal;
+use Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector;
 
 class MetricsControllerTest extends TestCase
 {
-    public function testSomething(): void
+    public function testMetrics(): void
     {
-        $systemConfigServiceMock = $this->getMockBuilder(SystemConfigService::class)
+        $metricsCollectorMock = $this->getMockBuilder(MetricsCollector::class)
             ->disableOriginalConstructor()
-            ->onlyMethods([])
+            ->onlyMethods(['collect'])
             ->getMock();
 
-        $connectionMock = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods([])
-            ->getMock();
-
-        $formFactory = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension())
-            ->getFormFactory();
-
-        $orderCountTotal = new OrdersCountTotal($connectionMock);
-        $iterator = new ArrayIterator([
-            $orderCountTotal
-        ]);
+        $metricsCollectorMock
+            ->expects($this->once())
+            ->method('collect')
+            ->willReturn('some-data');
 
         $metricsController = new MetricsController(
-            $systemConfigServiceMock,
-            $iterator,
+            $metricsCollectorMock,
             new NullLogger()
         );
 
         $request = new Request(['a' => 'b']);
-        $response = $metricsController->all($request, $formFactory);
+        $response = $metricsController->metrics($request);
 
-        $this->assertEquals('localhost', 'localhost');
+        $this->assertEquals('some-data', $response->getContent());
     }
 }

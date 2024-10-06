@@ -23,7 +23,7 @@ class MetricsController extends StorefrontController
         defaults: ['_routeScope' => ['store-api'], 'auth_required' => false],
         methods: ['GET'])
     ]
-    public function all(Request $request): Response
+    public function metrics(Request $request): Response
     {
         $data = $this->metricsCollector->collect();
 
