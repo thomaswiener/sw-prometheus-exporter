@@ -18,14 +18,12 @@ class TestCommand extends Command
     public function __construct(
         private readonly iterable $metrics
     ) {
-        $a = 1;
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this
-            ->setName('WienerioPrometheusMetrics');
+        $this->setName('WienerioPrometheusMetrics');
     }
 
     /**

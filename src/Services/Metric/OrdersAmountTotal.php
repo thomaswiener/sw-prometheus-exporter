@@ -3,13 +3,17 @@
 namespace Wienerio\ShopwarePrometheusExporter\Services\Metric;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\Result;
+use Psr\Log\LoggerInterface;
 
 class OrdersAmountTotal extends AbstractMetric
 {
-    public function __construct(
-        private readonly Connection $connection
-    ) {
-        $this->setType(MetricInterface::METRIC_TYPE_COUNTER);
+    public function __construct(Connection $connection, LoggerInterface $logger)
+    {
+        parent::__construct($connection, $logger);
+
+        $this->setType(MetricInterface::METRIC_TYPE_SUMMARY);
         $this->setHelp("Orders amount Total");
         $this->setName("shopware_orders_amount_total");
     }
@@ -22,32 +26,36 @@ class OrdersAmountTotal extends AbstractMetric
         return array_merge($this->getMetricHeader(), $data);
     }
 
+    /**
+     * @throws Exception
+     */
     protected function getOrdersAmountTotalBySalesChannel(array $salesChannels): array
     {
-        $query2 = 'select sum(amount_total) as `total`, hex(sales_channel_id) as id from `order` group by sales_channel_id';
-        $result = $this->connection->executeQuery($query2);
+        $result = $this->getQueryResult();
 
         $items = [];
-        foreach ($result->fetchAll() as $item) {
-            $label = $salesChannels[$item['id']];
-            $metric = $item['total'];
+        foreach ($result->fetchAllAssociative() as $item) {
+            $labelValue = $salesChannels[$item['id']];
+            $metricValue = $item['total'];
 
-            $items[] = "{$this->getName()}{sales_channel=\"{$label}\"} {$metric}";
+            $labels = ["sales_channel" => $labelValue];
+            $items[] = $this->renderMetricLine($this->getName(), $metricValue, $labels);
         }
 
         return $items;
     }
 
-    protected function getSalesChannelNamesById(): array
+    protected function getQueryResult(): Result
     {
-        $query1 = 'select hex(sct.sales_channel_id) as id, sct.`name` from sales_channel_translation sct, `language` l where sct.language_id = l.id and l.name = "Deutsch"';
-        $result = $this->connection->executeQuery($query1);
-
-        $items = [];
-        foreach ($result->fetchAll() as $item) {
-            $items[$item['id']] = $item['name'];
-        }
-
-        return $items;
+        $query = <<<SQL
+SELECT 
+    sum(amount_total) AS `total`, 
+    hex(sales_channel_id) AS `id` 
+FROM 
+    `order` 
+GROUP BY 
+    sales_channel_id
+SQL;
+        return $this->connection->executeQuery($query);
     }
 }

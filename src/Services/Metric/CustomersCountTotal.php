@@ -3,13 +3,16 @@
 namespace Wienerio\ShopwarePrometheusExporter\Services\Metric;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Result;
+use Psr\Log\LoggerInterface;
 
 class CustomersCountTotal extends AbstractMetric
 {
-    public function __construct(
-        private readonly Connection $connection
-    ) {
-        $this->setType(MetricInterface::METRIC_TYPE_COUNTER);
+    public function __construct(Connection $connection, LoggerInterface $logger)
+    {
+        parent::__construct($connection, $logger);
+
+        $this->setType(MetricInterface::METRIC_TYPE_SUMMARY);
         $this->setHelp("Customers count Total");
         $this->setName("shopware_customers_count_total");
     }
@@ -24,30 +27,33 @@ class CustomersCountTotal extends AbstractMetric
 
     protected function getCustomersCountTotalBySalesChannel(array $salesChannels): array
     {
-        $query2 = 'select count(*) as `count`, hex(sales_channel_id) as id from `customer` group by sales_channel_id';
-        $result = $this->connection->executeQuery($query2);
+        $result = $this->getQueryResult();
 
         $items = [];
-        foreach ($result->fetchAll() as $item) {
-            $label = $salesChannels[$item['id']];
-            $metric = $item['count'];
+        foreach ($result->fetchAllAssociative() as $item) {
+            $labelValue = $salesChannels[$item['id']];
+            $metricValue = $item['count'];
 
-            $items[] = "{$this->getName()}{sales_channel=\"{$label}\"} {$metric}";
+            $labels = ["sales_channel" => $labelValue];
+            $items[] = $this->renderMetricLine($this->getName(), $metricValue, $labels);
         }
 
         return $items;
     }
 
-    protected function getSalesChannelNamesById(): array
+    protected function getQueryResult(): Result
     {
-        $query1 = 'select hex(sct.sales_channel_id) as id, sct.`name` from sales_channel_translation sct, `language` l where sct.language_id = l.id and l.name = "Deutsch"';
-        $result = $this->connection->executeQuery($query1);
+        $query = <<<SQL
+SELECT 
+    count(*) as `count`, 
+    hex(sales_channel_id) as `id` 
+from 
+    `customer` 
+GROUP BY 
+    sales_channel_id
+SQL;
 
-        $items = [];
-        foreach ($result->fetchAll() as $item) {
-            $items[$item['id']] = $item['name'];
-        }
-
-        return $items;
+        return $this->connection->executeQuery($query);
     }
+
 }

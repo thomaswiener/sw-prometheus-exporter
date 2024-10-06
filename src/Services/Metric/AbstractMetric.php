@@ -2,6 +2,10 @@
 
 namespace Wienerio\ShopwarePrometheusExporter\Services\Metric;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+use Psr\Log\LoggerInterface;
+
 abstract class AbstractMetric implements MetricInterface
 {
     private bool $enabled = true;
@@ -9,6 +13,58 @@ abstract class AbstractMetric implements MetricInterface
     private string $help = "";
     private string $type = "";
     private string $name = "";
+
+    public function __construct(
+        protected readonly Connection $connection,
+        protected readonly LoggerInterface $logger
+    ) {}
+
+    protected function renderMetricLine(string $metricName, string|float|int $metricValue, array $labels = []): string
+    {
+        $label = $this->renderLabels($labels);
+
+        return "{$metricName}$label {$metricValue}";
+    }
+
+    protected function renderLabels(array $labels): string
+    {
+        $lines = [];
+        foreach ($labels as $key => $value) {
+            $lines[] = "$key=\"$value\"";
+        }
+
+        if (!$lines) {
+            return "";
+        }
+
+        return "{".implode(",", $lines)."}";
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function getSalesChannelNamesById(): array
+    {
+        $query = <<<SQL
+SELECT 
+    hex(sct.sales_channel_id) AS `id`, 
+    sct.`name` 
+FROM 
+    `sales_channel_translation` sct, 
+    `language` l 
+WHERE 
+    sct.language_id = l.id AND 
+    l.name = "Deutsch"
+SQL;
+        $result = $this->connection->executeQuery($query);
+
+        $items = [];
+        foreach ($result->fetchAllAssociative() as $item) {
+            $items[$item['id']] = $item['name'];
+        }
+
+        return $items;
+    }
 
     protected function getMetricHeader(): array
     {

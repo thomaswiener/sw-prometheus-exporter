@@ -2,10 +2,12 @@
 
 namespace Wienerio\ShopwarePrometheusExporter\Services;
 
+use Exception;
 use Iterator;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Wienerio\ShopwarePrometheusExporter\Services\Metric\MetricInterface;
+use Wienerio\ShopwarePrometheusExporter\ShopwarePrometheusExporter;
 
 class MetricsCollector
 {
@@ -23,7 +25,15 @@ class MetricsCollector
             if (!$metric->isEnabled()) {
                 continue;
             }
-            $metricsData = array_merge($metricsData, $metric->getData());
+            try {
+                $metricsData = array_merge($metricsData, $metric->getData());
+            } catch (Exception $e) {
+                $context = [
+                    'plugin' => ShopwarePrometheusExporter::UNIQUE_IDENTIFIER,
+                    'metric' => $metric->getName(),
+                ];
+                $this->logger->error('');
+            }
         }
 
         return implode("\n", $metricsData);
