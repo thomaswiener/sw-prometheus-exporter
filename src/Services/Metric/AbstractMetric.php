@@ -79,7 +79,7 @@ SQL;
     public function isEnabled(): bool
     {
         if ($this->getSystemConfig($this->getConfigKeyIsEnabled())) {
-            return $this->isEnabled();
+            return $this->enabled;
         }
 
         return false;
