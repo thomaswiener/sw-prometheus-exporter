@@ -22,18 +22,21 @@ services:
   Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersCountTotal:
     arguments:
       - '@Doctrine\DBAL\Connection'
+      - '@Shopware\Core\System\SystemConfig\SystemConfigService'
       - '@logger'
     tags: ['sw.prometheus.metric']
 
   Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersAmountTotal:
     arguments:
       - '@Doctrine\DBAL\Connection'
+      - '@Shopware\Core\System\SystemConfig\SystemConfigService'
       - '@logger'
     tags: ['sw.prometheus.metric']
 
   Wienerio\ShopwarePrometheusExporter\Services\Metric\CustomersCountTotal:
     arguments:
       - '@Doctrine\DBAL\Connection'
+      - '@Shopware\Core\System\SystemConfig\SystemConfigService'
       - '@logger'
     tags: ['sw.prometheus.metric']
 

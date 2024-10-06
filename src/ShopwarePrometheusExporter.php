@@ -7,4 +7,6 @@ use Shopware\Core\Framework\Plugin;
 class ShopwarePrometheusExporter extends Plugin
 {
     public const UNIQUE_IDENTIFIER = 'sw-prometheus-exporter';
+
+    public const CONFIG_IDENTIFIER = 'ShopwarePrometheusExporter';
 }

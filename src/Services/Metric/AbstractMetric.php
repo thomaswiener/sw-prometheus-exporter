@@ -5,17 +5,19 @@ namespace Wienerio\ShopwarePrometheusExporter\Services\Metric;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Wienerio\ShopwarePrometheusExporter\ShopwarePrometheusExporter;
 
 abstract class AbstractMetric implements MetricInterface
 {
     private bool $enabled = true;
-
     private string $help = "";
     private string $type = "";
     private string $name = "";
 
     public function __construct(
         protected readonly Connection $connection,
+        protected readonly SystemConfigService $systemConfigService,
         protected readonly LoggerInterface $logger
     ) {}
 
@@ -76,7 +78,11 @@ SQL;
 
     public function isEnabled(): bool
     {
-        return $this->enabled;
+        if ($this->getSystemConfig($this->getConfigKeyIsEnabled())) {
+            return $this->isEnabled();
+        }
+
+        return false;
     }
 
     abstract public function getData(): array;
@@ -132,5 +138,36 @@ SQL;
     protected function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    protected function getSystemConfig(string $key)
+    {
+        $namespace = ShopwarePrometheusExporter::CONFIG_IDENTIFIER;
+
+        return $this->systemConfigService->get("{$namespace}.config.{$key}");
+    }
+
+    protected function toCamelCase(string $value)
+    {
+        return str_replace(
+            ' ',
+            '',
+            ucwords(
+                str_replace(
+                    ['-', '_'],
+                    ' ',
+                    $value
+                )
+            )
+        );
+    }
+
+    protected function getConfigKeyIsEnabled()
+    {
+        return "{$this->getConfigKey()}IsEnabled";
+    }
+    protected function getConfigKey()
+    {
+        return $this->toCamelCase($this->getName());
     }
 }

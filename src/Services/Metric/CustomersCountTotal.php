@@ -5,12 +5,13 @@ namespace Wienerio\ShopwarePrometheusExporter\Services\Metric;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class CustomersCountTotal extends AbstractMetric
 {
-    public function __construct(Connection $connection, LoggerInterface $logger)
+    public function __construct(Connection $connection, SystemConfigService $systemConfigService, LoggerInterface $logger)
     {
-        parent::__construct($connection, $logger);
+        parent::__construct($connection, $systemConfigService, $logger);
 
         $this->setType(MetricInterface::METRIC_TYPE_SUMMARY);
         $this->setHelp("Customers count Total");

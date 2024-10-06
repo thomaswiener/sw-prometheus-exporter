@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/master/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>Metrics</title>
+
+        <input-field type="bool">
+            <name>ShopwareCustomersCountTotalIsEnabled</name>
+            <label>Enable shopwareCustomersAmountTotal</label>
+        </input-field>
+
+        <input-field type="bool">
+            <name>ShopwareOrdersAmountTotalIsEnabled</name>
+            <label>Enable shopwareOrdersAmountTotal</label>
+        </input-field>
+
+        <input-field type="bool">
+            <name>ShopwareOrdersCountTotalIsEnabled</name>
+            <label>Enable shopwareOrdersCountTotal</label>
+        </input-field>
+    </card>
+
+</config>

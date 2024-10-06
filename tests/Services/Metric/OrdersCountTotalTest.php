@@ -6,6 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersCountTotal;
 
 class OrdersCountTotalTest extends TestCase
@@ -59,7 +60,17 @@ class OrdersCountTotalTest extends TestCase
             ->method('executeQuery')
             ->willReturnOnConsecutiveCalls($result1, $result2);
 
-        $metric = new OrdersCountTotal($connectionMock, new NullLogger());
+        $systemConfigServiceMock = $this->getMockBuilder(SystemConfigService::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['get'])
+            ->getMock();
+
+        $systemConfigServiceMock
+            ->expects($this->any())
+            ->method('get')
+            ->willReturn(true);
+
+        $metric = new OrdersCountTotal($connectionMock, $systemConfigServiceMock, new NullLogger());
         $data = $metric->getData();
 
         $this->assertEquals('# HELP shopware_orders_count_total Orders count Total', $data['0']);

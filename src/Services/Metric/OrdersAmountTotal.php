@@ -6,12 +6,13 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Result;
 use Psr\Log\LoggerInterface;
+use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class OrdersAmountTotal extends AbstractMetric
 {
-    public function __construct(Connection $connection, LoggerInterface $logger)
+    public function __construct(Connection $connection, SystemConfigService $systemConfigService, LoggerInterface $logger)
     {
-        parent::__construct($connection, $logger);
+        parent::__construct($connection, $systemConfigService, $logger);
 
         $this->setType(MetricInterface::METRIC_TYPE_SUMMARY);
         $this->setHelp("Orders amount Total");

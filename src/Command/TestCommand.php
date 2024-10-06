@@ -44,6 +44,8 @@ class TestCommand extends Command
                 continue;
             }
 
+            $metric->isEnabled();
+
             $data = $metric->getData();
             $output->writeln(implode("\n", $data));
 
