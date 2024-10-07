@@ -70,8 +70,9 @@ class OrdersCountTotalTest extends TestCase
             ->method('get')
             ->willReturn(true);
 
-        $metric = new OrdersCountTotal($connectionMock, $systemConfigServiceMock, new NullLogger());
-        $data = $metric->getData();
+        $metricCollector = new OrdersCountTotal($connectionMock, $systemConfigServiceMock, new NullLogger());
+        $metric = $metricCollector->getMetric();
+        $data = $metric->renderMetrics();
 
         $this->assertEquals('# HELP shopware_orders_count_total Orders count Total', $data['0']);
         $this->assertEquals('# TYPE shopware_orders_count_total summary', $data['1']);

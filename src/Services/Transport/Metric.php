@@ -107,11 +107,21 @@ class Metric
         return $this;
     }
 
-    protected function getMetricHeader(): array
+    protected function getRenderedHelp(): string
+    {
+        return "# HELP {$this->getName()} {$this->getHelp()}";
+    }
+
+    protected function getRenderedType(): string
+    {
+        return "# TYPE {$this->getName()} {$this->getType()}";
+    }
+
+    public function getMetricHeader(): array
     {
         return [
-            "# HELP {$this->getName()} {$this->getHelp()}",
-            "# TYPE {$this->getName()} {$this->getType()}",
+            $this->getRenderedHelp(),
+            $this->getRenderedType(),
         ];
     }
 

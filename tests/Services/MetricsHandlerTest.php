@@ -9,8 +9,10 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersCountTotal;
 use Wienerio\ShopwarePrometheusExporter\Services\MetricsHandler;
+use Wienerio\ShopwarePrometheusExporter\Services\Transport\Metric;
+use Wienerio\ShopwarePrometheusExporter\Services\Transport\MetricValue;
 
-class MetricsCollectorTest extends TestCase
+class MetricsHandlerTest extends TestCase
 {
     public function testCollectException(): void
     {
@@ -25,7 +27,7 @@ class MetricsCollectorTest extends TestCase
 
         $ordersCountTotalMock = $this->getMockBuilder(OrdersCountTotal::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['isEnabled', 'getData', 'getName'])
+            ->onlyMethods(['isEnabled', 'getMetric', 'getName'])
             ->getMock();
 
         $ordersCountTotalMock
@@ -35,7 +37,7 @@ class MetricsCollectorTest extends TestCase
 
         $ordersCountTotalMock
             ->expects($this->once())
-            ->method('getData')
+            ->method('getMetric')
             ->willThrowException(new Exception('error processing'));
 
         $iterator = new ArrayIterator([
@@ -56,7 +58,7 @@ class MetricsCollectorTest extends TestCase
     {
         $ordersCountTotalMock = $this->getMockBuilder(OrdersCountTotal::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['isEnabled', 'getData', 'getName'])
+            ->onlyMethods(['isEnabled', 'getMetric', 'getName'])
             ->getMock();
 
         $ordersCountTotalMock
@@ -64,14 +66,14 @@ class MetricsCollectorTest extends TestCase
             ->method('isEnabled')
             ->willReturn(true);
 
+        $metric = new Metric('orders_count_total', 'summary', 'some help test');
+        $metricValue = new MetricValue(1);
+        $metric->addMetricValue($metricValue);
+
         $ordersCountTotalMock
             ->expects($this->once())
-            ->method('getData')
-            ->willReturn([
-                '# HELP some help test',
-                '# TYPE orders_count_total summary',
-                'orders_count_total 1'
-            ]);
+            ->method('getMetric')
+            ->willReturn($metric);
 
         $iterator = new ArrayIterator([
             $ordersCountTotalMock

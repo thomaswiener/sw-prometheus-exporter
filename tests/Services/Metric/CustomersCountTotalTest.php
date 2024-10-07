@@ -11,7 +11,7 @@ use Wienerio\ShopwarePrometheusExporter\Services\Metric\CustomersCountTotal;
 
 class CustomersCountTotalTest extends TestCase
 {
-    public function testGetData(): void
+    public function testGetMetric(): void
     {
         $result1 = $this->getMockBuilder(Result::class)
             ->disableOriginalConstructor()
@@ -70,8 +70,9 @@ class CustomersCountTotalTest extends TestCase
             ->method('get')
             ->willReturn(true);
 
-        $metric = new CustomersCountTotal($connectionMock, $systemConfigServiceMock, new NullLogger());
-        $data = $metric->getData();
+        $metricCollector = new CustomersCountTotal($connectionMock, $systemConfigServiceMock, new NullLogger());
+        $metric = $metricCollector->getMetric();
+        $data = $metric->renderMetrics();
 
         $this->assertEquals('# HELP shopware_customers_count_total Customers count Total', $data['0']);
         $this->assertEquals('# TYPE shopware_customers_count_total summary', $data['1']);

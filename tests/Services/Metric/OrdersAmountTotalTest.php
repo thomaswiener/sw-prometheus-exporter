@@ -70,8 +70,9 @@ class OrdersAmountTotalTest extends TestCase
             ->method('get')
             ->willReturn(true);
 
-        $metric = new OrdersAmountTotal($connectionMock, $systemConfigServiceMock, new NullLogger());
-        $data = $metric->getData();
+        $metricCollector = new OrdersAmountTotal($connectionMock, $systemConfigServiceMock, new NullLogger());
+        $metric = $metricCollector->getMetric();
+        $data = $metric->renderMetrics();
 
         $this->assertEquals('# HELP shopware_orders_amount_total Orders amount Total', $data['0']);
         $this->assertEquals('# TYPE shopware_orders_amount_total summary', $data['1']);

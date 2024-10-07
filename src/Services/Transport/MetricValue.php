@@ -7,7 +7,7 @@ class MetricValue
 {
     private float|int $value;
 
-    private array $labels;
+    private array $labels = [];
 
     public function __construct(float|int $value)
     {
