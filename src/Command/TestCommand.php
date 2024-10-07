@@ -2,13 +2,12 @@
 
 namespace Wienerio\ShopwarePrometheusExporter\Command;
 
-use Iterator;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Wienerio\ShopwarePrometheusExporter\Services\Metric\MetricInterface;
+use Wienerio\ShopwarePrometheusExporter\Services\MetricInterface;
 
 #[AsCommand(
     name: 'wio:prometheus:metrics:test',
@@ -27,7 +26,7 @@ class TestCommand extends Command
         $this
             ->setName('SwPrometheusMetrics')
             ->setDescription('Helper Command to test metrics rendering')
-            ->addArgument('metric-name', InputArgument::REQUIRED, 'Metric Name');
+            ->addArgument('metric-name', InputArgument::OPTIONAL, 'Metric Name');
 
     }
 
@@ -40,16 +39,17 @@ class TestCommand extends Command
     {
         foreach ($this->metrics as $metric) {
             /** @var MetricInterface $metric */
-            if ($metric->getName() !== $input->getArgument('metric-name')) {
-                continue;
+            if ($input->hasArgument('metric-name') && $input->getArgument('metric-name')) {
+                if ($metric->getName() !== $input->getArgument('metric-name')) {
+                    continue;
+                }
             }
 
-            $metric->isEnabled();
-
-            $data = $metric->getData();
+            if (!$metric->isEnabled()) {
+                continue;
+            }
+            $data = $metric->getMetric()->renderMetrics();
             $output->writeln(implode("\n", $data));
-
-            break;
         }
 
         return Command::SUCCESS;

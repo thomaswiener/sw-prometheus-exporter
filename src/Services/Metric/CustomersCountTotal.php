@@ -6,40 +6,36 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Wienerio\ShopwarePrometheusExporter\Services\AbstractMetricCollector;
+use Wienerio\ShopwarePrometheusExporter\Services\MetricInterface;
+use Wienerio\ShopwarePrometheusExporter\Services\Transport\Metric;
+use Wienerio\ShopwarePrometheusExporter\Services\Transport\MetricValue;
 
-class CustomersCountTotal extends AbstractMetric
+class CustomersCountTotal extends AbstractMetricCollector
 {
     public function __construct(Connection $connection, SystemConfigService $systemConfigService, LoggerInterface $logger)
     {
         parent::__construct($connection, $systemConfigService, $logger);
-
-        $this->setType(MetricInterface::METRIC_TYPE_SUMMARY);
-        $this->setHelp("Customers count Total");
         $this->setName("shopware_customers_count_total");
+        $this->metric = new Metric(
+            $this->getName(),
+            MetricInterface::METRIC_TYPE_SUMMARY,
+            "Customers count Total"
+        );
     }
 
-    public function getData(): array
+    public function getMetric(): Metric
     {
         $salesChannels = $this->getSalesChannelNamesById();
-        $data = $this->getCustomersCountTotalBySalesChannel($salesChannels);
-
-        return array_merge($this->getMetricHeader(), $data);
-    }
-
-    protected function getCustomersCountTotalBySalesChannel(array $salesChannels): array
-    {
         $result = $this->getQueryResult();
 
-        $items = [];
         foreach ($result->fetchAllAssociative() as $item) {
-            $labelValue = $salesChannels[$item['id']];
-            $metricValue = $item['count'];
-
-            $labels = ["sales_channel" => $labelValue];
-            $items[] = $this->renderMetricLine($this->getName(), $metricValue, $labels);
+            $metricValue = new MetricValue(intval($item['count']));
+            $metricValue->addLabel('sales_channel', $salesChannels[$item['id']]);
+            $this->metric->addMetricValue($metricValue);
         }
 
-        return $items;
+        return $this->metric;
     }
 
     protected function getQueryResult(): Result
@@ -56,5 +52,4 @@ SQL;
 
         return $this->connection->executeQuery($query);
     }
-
 }

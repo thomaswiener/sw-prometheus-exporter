@@ -6,13 +6,13 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Wienerio\ShopwarePrometheusExporter\Controller\Storefront\MetricsController;
-use Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector;
+use Wienerio\ShopwarePrometheusExporter\Services\MetricsHandler;
 
 class MetricsControllerTest extends TestCase
 {
     public function testMetrics(): void
     {
-        $metricsCollectorMock = $this->getMockBuilder(MetricsCollector::class)
+        $metricsCollectorMock = $this->getMockBuilder(MetricsHandler::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['collect'])
             ->getMock();

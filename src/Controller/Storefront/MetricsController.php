@@ -8,12 +8,12 @@ use Shopware\Storefront\Controller\StorefrontController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector;
+use Wienerio\ShopwarePrometheusExporter\Services\MetricsHandler;
 
 class MetricsController extends StorefrontController
 {
     public function __construct(
-        private readonly MetricsCollector $metricsCollector,
+        private readonly MetricsHandler  $metricsHandler,
         private readonly LoggerInterface $logger
     ) {}
 
@@ -25,7 +25,7 @@ class MetricsController extends StorefrontController
     ]
     public function metrics(Request $request): Response
     {
-        $data = $this->metricsCollector->collect();
+        $data = $this->metricsHandler->collect();
 
         return $this->getResponse($data);
     }
@@ -38,15 +38,3 @@ class MetricsController extends StorefrontController
         return $response;
     }
 }
-
-/*
-$salesChannel = $this->salesChannelService->getSalesChannelByHost($request->getHttpHost());
-
-$textContent = $this->systemConfigService->get('RockitPrometheusIntegration.config.responseText', $salesChannel->getSalesChannelId());
-
-if(isset($textContent)) {
-    $textContent .= "\n";
-}
-
-$textContent .= $this->metricsService->getMetrics($salesChannel->getSalesChannelId());
- */

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Wienerio\ShopwarePrometheusExporter\Services\Metric;
+namespace Wienerio\ShopwarePrometheusExporter\Services;
+
+use Wienerio\ShopwarePrometheusExporter\Services\Transport\Metric;
 
 interface MetricInterface
 {
@@ -28,7 +30,5 @@ interface MetricInterface
 
     public function getName(): string;
 
-    public function getType(): string;
-
-    public function getData(): array;
+    public function getMetric(): Metric;
 }

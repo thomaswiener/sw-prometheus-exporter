@@ -9,12 +9,12 @@ services:
   Wienerio\ShopwarePrometheusExporter\Controller\Storefront\MetricsController:
     public: true
     arguments:
-      - '@Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector'
+      - '@Wienerio\ShopwarePrometheusExporter\Services\MetricsHandler'
       - '@logger'
     calls:
       - setContainer: ['@service_container']
 
-  Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector:
+  Wienerio\ShopwarePrometheusExporter\Services\MetricsHandler:
     arguments:
       - !tagged 'sw.prometheus.metric'
       - '@logger'

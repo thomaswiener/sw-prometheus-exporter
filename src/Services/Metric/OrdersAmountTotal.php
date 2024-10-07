@@ -3,47 +3,40 @@
 namespace Wienerio\ShopwarePrometheusExporter\Services\Metric;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Result;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Wienerio\ShopwarePrometheusExporter\Services\AbstractMetricCollector;
+use Wienerio\ShopwarePrometheusExporter\Services\MetricInterface;
+use Wienerio\ShopwarePrometheusExporter\Services\Transport\Metric;
+use Wienerio\ShopwarePrometheusExporter\Services\Transport\MetricValue;
 
-class OrdersAmountTotal extends AbstractMetric
+class OrdersAmountTotal extends AbstractMetricCollector
 {
     public function __construct(Connection $connection, SystemConfigService $systemConfigService, LoggerInterface $logger)
     {
         parent::__construct($connection, $systemConfigService, $logger);
 
-        $this->setType(MetricInterface::METRIC_TYPE_SUMMARY);
-        $this->setHelp("Orders amount Total");
         $this->setName("shopware_orders_amount_total");
+        $this->metric = new Metric(
+            $this->getName(),
+            MetricInterface::METRIC_TYPE_SUMMARY,
+            "Orders amount Total"
+        );
     }
 
-    public function getData(): array
+    public function getMetric(): Metric
     {
         $salesChannels = $this->getSalesChannelNamesById();
-        $data = $this->getOrdersAmountTotalBySalesChannel($salesChannels);
-
-        return array_merge($this->getMetricHeader(), $data);
-    }
-
-    /**
-     * @throws Exception
-     */
-    protected function getOrdersAmountTotalBySalesChannel(array $salesChannels): array
-    {
         $result = $this->getQueryResult();
 
-        $items = [];
         foreach ($result->fetchAllAssociative() as $item) {
-            $labelValue = $salesChannels[$item['id']];
-            $metricValue = $item['total'];
-
-            $labels = ["sales_channel" => $labelValue];
-            $items[] = $this->renderMetricLine($this->getName(), $metricValue, $labels);
+            $metricValue = new MetricValue(floatval($item['total']));
+            $metricValue->addLabel('sales_channel', $salesChannels[$item['id']]);
+            $this->metric->addMetricValue($metricValue);
         }
 
-        return $items;
+        return $this->metric;
     }
 
     protected function getQueryResult(): Result

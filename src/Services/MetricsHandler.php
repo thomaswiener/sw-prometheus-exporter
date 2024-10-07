@@ -4,30 +4,29 @@ namespace Wienerio\ShopwarePrometheusExporter\Services;
 
 use Exception;
 use Psr\Log\LoggerInterface;
-use Wienerio\ShopwarePrometheusExporter\Services\Metric\MetricInterface;
 use Wienerio\ShopwarePrometheusExporter\ShopwarePrometheusExporter;
 
-class MetricsCollector
+class MetricsHandler
 {
     public function __construct(
-        private readonly iterable $metrics,
+        private readonly iterable        $metricCollectors,
         private readonly LoggerInterface $logger
     ) {}
 
     public function collect(): string
     {
         $metricsData = [];
-        foreach ($this->metrics as $metric) {
-            /** @var MetricInterface $metric */
-            if (!$metric->isEnabled()) {
+        foreach ($this->metricCollectors as $metricCollector) {
+            /** @var MetricInterface $metricCollector */
+            if (!$metricCollector->isEnabled()) {
                 continue;
             }
             try {
-                $metricsData = array_merge($metricsData, $metric->getData());
+                $metricsData = array_merge($metricsData, $metricCollector->getMetric()->renderMetrics());
             } catch (Exception $e) {
                 $context = [
                     'plugin' => ShopwarePrometheusExporter::UNIQUE_IDENTIFIER,
-                    'metric' => $metric->getName(),
+                    'metric' => $metricCollector->getName(),
                     'message' => $e->getMessage()
                 ];
                 $this->logger->error('Error getting metric data for prometheus', $context);

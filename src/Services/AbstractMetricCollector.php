@@ -1,19 +1,21 @@
 <?php declare(strict_types=1);
 
-namespace Wienerio\ShopwarePrometheusExporter\Services\Metric;
+namespace Wienerio\ShopwarePrometheusExporter\Services;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerInterface;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Wienerio\ShopwarePrometheusExporter\Services\Transport\Metric;
 use Wienerio\ShopwarePrometheusExporter\ShopwarePrometheusExporter;
 
-abstract class AbstractMetric implements MetricInterface
+abstract class AbstractMetricCollector implements MetricInterface
 {
     private bool $enabled = true;
-    private string $help = "";
-    private string $type = "";
-    private string $name = "";
+
+    private string $name;
+
+    protected Metric $metric;
 
     public function __construct(
         protected readonly Connection $connection,
@@ -21,25 +23,20 @@ abstract class AbstractMetric implements MetricInterface
         protected readonly LoggerInterface $logger
     ) {}
 
-    protected function renderMetricLine(string $metricName, string|float|int $metricValue, array $labels = []): string
+    public function getName(): string
     {
-        $label = $this->renderLabels($labels);
-
-        return "{$metricName}$label {$metricValue}";
+        return $this->name;
     }
 
-    protected function renderLabels(array $labels): string
+    /**
+     * @param string $name
+     * @return AbstractMetricCollector
+     */
+    public function setName(string $name): AbstractMetricCollector
     {
-        $lines = [];
-        foreach ($labels as $key => $value) {
-            $lines[] = "$key=\"$value\"";
-        }
+        $this->name = $name;
 
-        if (!$lines) {
-            return "";
-        }
-
-        return "{".implode(",", $lines)."}";
+        return $this;
     }
 
     /**
@@ -68,14 +65,6 @@ SQL;
         return $items;
     }
 
-    protected function getMetricHeader(): array
-    {
-        return [
-            "# HELP {$this->getName()} {$this->getHelp()}",
-            "# TYPE {$this->getName()} {$this->getType()}",
-        ];
-    }
-
     public function isEnabled(): bool
     {
         if ($this->getSystemConfig($this->getConfigKeyIsEnabled())) {
@@ -85,59 +74,11 @@ SQL;
         return false;
     }
 
-    abstract public function getData(): array;
+    abstract public function getMetric(): Metric;
 
     public function setEnabled(bool $enabled): void
     {
         $this->enabled = $enabled;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHelp(): string
-    {
-        return $this->help;
-    }
-
-    /**
-     * @param string $help
-     */
-    protected function setHelp(string $help): void
-    {
-        $this->help = $help;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
-     */
-    protected function setType(string $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
-     */
-    protected function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     protected function getSystemConfig(string $key)

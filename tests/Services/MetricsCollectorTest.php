@@ -8,7 +8,7 @@ use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersCountTotal;
-use Wienerio\ShopwarePrometheusExporter\Services\MetricsCollector;
+use Wienerio\ShopwarePrometheusExporter\Services\MetricsHandler;
 
 class MetricsCollectorTest extends TestCase
 {
@@ -42,7 +42,7 @@ class MetricsCollectorTest extends TestCase
             $ordersCountTotalMock
         ]);
 
-        $metricsCollector = new MetricsCollector(
+        $metricsCollector = new MetricsHandler(
             $iterator,
             $loggerMock
         );
@@ -77,7 +77,7 @@ class MetricsCollectorTest extends TestCase
             $ordersCountTotalMock
         ]);
 
-        $metricsCollector = new MetricsCollector(
+        $metricsCollector = new MetricsHandler(
             $iterator,
             new NullLogger()
         );
