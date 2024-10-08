@@ -43,7 +43,7 @@ class OrdersAmountTotal extends AbstractMetricCollector
     {
         $query = <<<SQL
 SELECT 
-    sum(amount_total) AS `total`, 
+    sum(amount_total) * COUNT(DISTINCT `id`) / COUNT(*) AS `total`, 
     hex(sales_channel_id) AS `id` 
 FROM 
     `order` 

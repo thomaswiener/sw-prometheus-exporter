@@ -42,9 +42,9 @@ class CustomersCountTotal extends AbstractMetricCollector
     {
         $query = <<<SQL
 SELECT 
-    count(*) as `count`, 
+    count(distinct `id`) as `count`, 
     hex(sales_channel_id) as `id` 
-from 
+FROM 
     `customer` 
 GROUP BY 
     sales_channel_id

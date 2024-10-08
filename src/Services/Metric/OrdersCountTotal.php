@@ -62,7 +62,7 @@ class OrdersCountTotal extends AbstractMetricCollector
     {
         $query = <<<SQL
 SELECT
-    count(*) AS `count`, 
+    count(distinct `id`) as `count`, 
     hex(sales_channel_id) AS `id` 
 FROM 
     `order` 
