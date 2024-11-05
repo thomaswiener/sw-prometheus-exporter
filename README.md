@@ -49,15 +49,7 @@ Wienerio\ShopwarePrometheusExporter\Services\Metric\OrdersCountTotal:
   tags: ['sw.prometheus.metric']     
 ```
 
-Your metric should just respond with an array of string values:
-
-```
-[
-  '# HELP Metric name',
-  '# TYPE metric_name summary',
-  'metric_name 1'
-]
-```
+Your metric should just respond with an instance of Transport\Metric. Each Metric contains one or more MetricValues.
 
 ## Contribution
 
